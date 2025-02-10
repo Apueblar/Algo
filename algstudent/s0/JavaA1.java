@@ -19,8 +19,9 @@ public class JavaA1 {
 	private ArrayList primeList(int n) {
 		ArrayList primes = new ArrayList();
 		for(int i =2; i<n+1;i++) {
-			if(primoA1(i))
+			if(primoA1(i)) {
 				primes.add(i);
+			}
 		}
 		return primes;
 	}
@@ -29,8 +30,9 @@ public class JavaA1 {
 		boolean p = true;
 		
 		for(int i = 2; i<n;i++) {
-			if(n%i ==0)
+			if(n%i ==0) {
 				p = false;
+			}
 		}
 		return p;
 	}
