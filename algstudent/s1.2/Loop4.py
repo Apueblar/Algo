@@ -15,13 +15,14 @@ def main():
     print ("TIME (milliseconds)")
     t1=0
     t2=0
-    n=100
+    n=200
     cont=0
     for i in range (10):
         t1=time()
-        c=loop4(n)
+        for _ in range(1):
+            c=loop4(n)
         t2=time()
-        print("n= ",n,"**time=",int(1000*(t2-t1)),"**counter=",c)
+        print("n= ",n,"**time=",int((t2-t1)),"**counter=",c)
         n=n*2
 
 
