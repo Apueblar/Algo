@@ -1,4 +1,4 @@
-package algstudent.s2;
+package Quick;
 
 public class QuicksortInsertion {
 	static int[] v;
@@ -55,13 +55,12 @@ public class QuicksortInsertion {
 	public static void insertion(int[] a, int left, int right) {
 		int j;
 		int pivot;
-		int n = right - left;
 		
-		for (int i =  1; i < n; i++) {
+		for (int i = left + 1; i <= right; i++) {
 			pivot = a[i];
 			j = i-1;
 			
-			while (j >= 0 && pivot < a[j]) {
+			while (j >= left && pivot < a[j]) {
 				a[j+1] = a[j];
 				j--;
 			}

@@ -1,4 +1,4 @@
-package algstudent.s2;
+package Quick;
 
 /* This program is used to order n elements with Quicksort */
 public class Quicksort {

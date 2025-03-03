@@ -1,4 +1,4 @@
-package algstudent.s2;
+package Quick;
 
 import java.util.Random;
 

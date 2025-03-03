@@ -1,4 +1,4 @@
-package algstudent.s2;
+package Quick;
 
 public class QuicksortTimes {
 	static int[] v;
@@ -7,7 +7,7 @@ public class QuicksortTimes {
 		long t1, t2;
 		String opcion = arg[0];
 
-		for (int n = 250000; n <= 1000000000; n *= 2) {
+		for (int n = 16*1000000; n <= 1000000000; n *= 2) {
 			v = new int[n];
 
 			if (opcion.compareTo("ordered") == 0)
@@ -19,7 +19,7 @@ public class QuicksortTimes {
 
 			t1 = System.currentTimeMillis();
 
-			Quicksort.quicksort(v);
+			QuicksortInsertion.quicksortInsertion(v,1000);
 
 			t2 = System.currentTimeMillis();
 
