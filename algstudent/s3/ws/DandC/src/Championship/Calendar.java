@@ -116,19 +116,17 @@ public class Calendar {
         printSchedule(schedule);
     }
 
-	private static void printSchedule(String[][] schedule) {
-		// Print the header for the table
-        System.out.println("PLAYER/OPPONENT" + getDayHeaders(schedule.length-1));
-
-        // Print the pairing schedule
+    private static void printSchedule(String[][] schedule) {
+        // Now, use the total number of rounds, which is schedule[0].length
+        System.out.println("PLAYER/OPPONENT" + getDayHeaders(schedule[0].length-1));
         for (int i = 0; i < schedule.length; i++) {
             for (int j = 0; j < schedule[i].length; j++) {
                 System.out.print(schedule[i][j] + "\t");
-                if (j == 0) {System.out.print("\t");}
+                if (j == 0) { System.out.print("\t"); }
             }
             System.out.println();
         }
-	}
+    }
 	
 	// Helper method to generate the headers for the table
     private static String getDayHeaders(int numDays) {
