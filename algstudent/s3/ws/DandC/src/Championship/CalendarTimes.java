@@ -6,25 +6,24 @@ public class CalendarTimes {
 
     public static void main(String[] args) {
         // Number of participants will start at 2 and double each time
-        int maxSize = 32;  // Set an upper limit for testing (can be adjusted)
-        
-        // Test with participant numbers: 2, 4, 8, 16, 32...
-        for (int n = 2; n <= maxSize; n *= 2) {
-            // Generate random participants
-            List<String> participants = generateRandomParticipants(n);
+    	long t1,t2,i = 0;
+		for (int n=2;n<=10000000;n*=2)
+		{
+			List<String> participants = generateRandomParticipants(n);
+			
+			int repes = 10;
+			t1 = System.currentTimeMillis ();
+			
+			for (int reps = 0; reps < repes; reps++) {
+				String[][] schedule = new String[n][n];
+	            Calendar.generateSchedule(participants, schedule);
+			}
             
-            // Measure time taken to generate the schedule
-            long startTime = System.nanoTime();
-            
-            // Generate the schedule
-            Calendar.generateSchedule(participants);
-            
-            long endTime = System.nanoTime();
-            long duration = endTime - startTime;  // Time in nanoseconds
-            
-            // Print the results
-            System.out.println("For " + n + " participants, time taken: " + duration + " nanoseconds.");
-        }
+			t2 = System.currentTimeMillis ();
+			
+			i++;
+			System.out.println ("n^"+i+ "**TIME="+ ((double)t2-t1)/repes + "**REAL="+(t2-t1));
+		}
     }
 
     // Method to generate random participants

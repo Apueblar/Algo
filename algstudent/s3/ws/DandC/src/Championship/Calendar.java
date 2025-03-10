@@ -26,42 +26,17 @@ public class Calendar {
     }
 
     // Method to generate the schedule (Divide and Conquer strategy)
-    public static void generateSchedule(List<String> participants) {
+    public static void generateSchedule(List<String> participants, String[][] schedule) {
         int n = participants.size();
-        int numDays = n - 1;  // If n is a power of 2, n - 1 days are needed; otherwise n days will be used.
-
         // If the number of participants is not a power of two, adjust the number of days to be n
         if ((n & (n - 1)) != 0) {  // This checks if n is not a power of two
-            numDays = n;  // If not a power of 2, we use n days
+            
         }
-
-        // Initialize a schedule matrix
-        String[][] schedule = new String[n][n];
         
         prepareForLoop(schedule, participants);
 
         // Generate the round-robin pairings
-        generateRoundRobin(participants, schedule, 0, n - 1, numDays);
-
-        // Print the header for the table
-        System.out.println("PLAYER/OPPONENT   " + getDayHeaders(numDays));
-
-        // Print the pairing schedule
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.print(schedule[i][j] + "\t"); // Opponent for each day
-            }
-            System.out.println();
-        }
-    }
-    
- // Helper method to generate the headers for the table
-    private static String getDayHeaders(int numDays) {
-        StringBuilder header = new StringBuilder();
-        for (int i = 1; i <= numDays; i++) {
-            header.append("DAY ").append(i).append("\t");
-        }
-        return header.toString();
+        generateRoundRobin(participants, schedule, 0, n - 1);
     }
     
     private static void prepareForLoop(String[][] schedule, List<String> participants) {
@@ -71,20 +46,35 @@ public class Calendar {
 	}
 
     // Method to generate the pairings using Divide and Conquer strategy
-    private static void generateRoundRobin(List<String> participants, String[][] schedule, int start, int end, int numDays) {
-    	int participantNum = end - start + 1;
-        if (participantNum == 2) {
-        	schedule[start][end-start] = participants.get(end);
-        	schedule[end][end-start] = participants.get(start);
-        } else {
-        	int mid = (start + end) / 2;
-        	generateRoundRobin(participants, schedule, start, mid, numDays);
-        	generateRoundRobin(participants, schedule, mid+1, end, numDays);
-        	
-
+    private static void generateRoundRobin(List<String> participants, String[][] schedule, int start, int end) {
+        int participantNum = end - start + 1;
+        if (participantNum != 1) {
+            int mid = (start + end) / 2;
+            generateRoundRobin(participants, schedule, start, mid);
             
+            int m = mid - start + 1; // number of participants in left half
+            
+            // Fill cross-match rounds for left-group teams.
+            // These rounds start at index (m-1) in the schedule.
+            for (int i = start; i <= mid; i++) {
+                for (int j = 0; j < m; j++) {  // j goes from 0 to m-1 (the extra rounds)
+                    // Change here: assign opponent from right half using cyclic rotation
+                    schedule[i][j + m] = participants.get(mid + 1 + ((i - start + j) % m));
+                }
+            }
+            
+            generateRoundRobin(participants, schedule, mid + 1, end);
+            
+            // Fill cross-match rounds for right-group teams.
+            for (int i = mid + 1; i <= end; i++) {
+                for (int j = 0; j < m; j++) {  // j goes from 0 to m-1 (the extra rounds)
+                    // Change here: assign opponent from left half using cyclic rotation
+                    schedule[i][j + m] = participants.get(start + (((i - (mid + 1)) - j + m) % m));
+                }
+            }
         }
     }
+
     /*
      * Player	1
      * p1		p2
@@ -107,7 +97,7 @@ public class Calendar {
 
         // Read the participants from the specified file
         String filename = args[0];
-        String filePath = "C:\\Users\\uo299874\\Desktop\\Alg\\Algo\\algstudent\\s3\\ws\\DandC\\src\\Championship\\" + filename; // Full path to the file
+        String filePath = "src/Championship/" + filename; // Full path to the file
         
         List<String> participants = readParticipants(filePath);
 
@@ -117,8 +107,35 @@ public class Calendar {
             System.out.println("Error: The number of participants must be a power of two.");
             return;
         }
+        
+        String[][] schedule = new String[n][n];
 
         // Generate the schedule
-        generateSchedule(participants);
+        generateSchedule(participants, schedule);
+        
+        printSchedule(schedule);
+    }
+
+	private static void printSchedule(String[][] schedule) {
+		// Print the header for the table
+        System.out.println("PLAYER/OPPONENT" + getDayHeaders(schedule.length-1));
+
+        // Print the pairing schedule
+        for (int i = 0; i < schedule.length; i++) {
+            for (int j = 0; j < schedule[i].length; j++) {
+                System.out.print(schedule[i][j] + "\t");
+                if (j == 0) {System.out.print("\t");}
+            }
+            System.out.println();
+        }
+	}
+	
+	// Helper method to generate the headers for the table
+    private static String getDayHeaders(int numDays) {
+        StringBuilder header = new StringBuilder();
+        for (int i = 1; i <= numDays; i++) {
+            header.append("\tDAY ").append(i);
+        }
+        return header.toString();
     }
 }
