@@ -1,5 +1,6 @@
 import json
 import heapq
+import time
 
 # Initialize an empty heap
 heap = []
@@ -50,18 +51,29 @@ def greedy(mapa):
     return node_colours
 
 if __name__ == "__main__":
-
-    n = 128
-    with open('sols/g' + str(n) + '.json') as f:
-        map = json.load(f)
-        f.close()
-    solution = greedy(map["graph"])
-
-    if solution:
-        print("Solution found:", solution)
-        draw_coloured_map(map, solution)
-        with open('solution.json', 'w') as f:
-            json.dump(solution, f)
+    repetitions = 100
+    for n in range(3,17):
+        with open('sols/g' + str(2**n) + '.json') as f:
+            map = json.load(f)
             f.close()
-    else:
-        print("Solution not found.")
+        
+        start_time = time.time()  # Start time
+
+        for _ in range(0,repetitions):
+            solution = greedy(map["graph"])
+        
+        end_time = time.time()  # End time
+        elapsed_time = end_time - start_time
+        print(f"{n} - Elapsed time: {elapsed_time/repetitions} seconds")
+
+        input("Continue")
+
+        # if solution:
+        #     print("Solution found:", solution)
+        #     draw_coloured_map(map, solution)
+        #     with open('solution.json', 'w') as f:
+        #         json.dump(solution, f)
+        #         f.close()
+        # else:
+        #     print("Solution not found.")
+    
