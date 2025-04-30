@@ -1,6 +1,6 @@
 Quite good overall.
 
-* Divide and Conquer is a organizational mess. Could use some cleaning up.
+* Divide and Conquer is a organizational mess. Could use some cleaning up. (DONE)
 * There are some problems when path building in Floyd. I did a try with the following matrix:
 ```
 static void fillInWeights(int[][] w) {
