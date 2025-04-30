@@ -13,7 +13,8 @@ public class MinimumPathsTimes {
             t1 = System.currentTimeMillis();
             
             for (int i = 0; i < reps; i++) {
-            	MinimumPaths.basicAlgorithm(n);
+            	MinimumPaths mp = new MinimumPaths(n);
+            	mp.basicAlgorithm();
             }
             
             t2 = System.currentTimeMillis();

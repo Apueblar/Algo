@@ -3,63 +3,154 @@ package MinPath;
 import java.util.Random;
 
 public class MinimumPaths {
-	final static double p1=0.5; 
-	final static double p2=0.5; // Unused
-	final static int minWeight=10; 
-	final static int maxWeight=99;
 
-	public static void basicAlgorithm(int n) {
-		String[] v = new String[n];
-		for (int i = 0; i < n; i++)
-			v[i] = "NODE" + i;
+    final static double p1 = 0.5;
+    final static int minWeight = 10;
+    final static int maxWeight = 99;
 
-		int[][] weights = new int[n][n];
-		int[][] costs = new int[n][n];
-		int[][] p = new int[n][n];
+    public String[] v;            // node labels
+    public int[][] weights;       // adjacency matrix
+    public int[][] costs;         // shortest-path cost matrix
+    public int[][] p;             // predecessor matrix
 
-		fillInRandomWeights(weights); //weights for the example
+    public static final int INFINITE = Integer.MAX_VALUE;
+    public static final int EMPTY = -1;
 
-		floyd(weights, costs, p);
-	}
-
-	/* ITERATIVE WITH CUBIC COMPLEXITY O(n^3) */
-	static void floyd(int[][] weights, int[][] costs, int[][] p) {
-		int n = weights.length;
-        // initialize costs and predecessor matrix
+    public MinimumPaths(int n) {
+        v = new String[n];
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                costs[i][j] = weights[i][j];
-                if (i == j)
-                    p[i][j] = i;  // self loop
-                else if (weights[i][j] != Integer.MAX_VALUE)
-                    p[i][j] = i;  // direct edge exists, predecessor is i
-                else
-                    p[i][j] = -1; // no direct edge
-            }
+            v[i] = "NODE" + i;
         }
-        // Floyd-Warshall algorithm
+        weights = new int[n][n];
+        costs = new int[n][n];
+        p = new int[n][n];
+    }
+
+    public MinimumPaths(String[] v, int[][] weights) {
+        this.v = v;
+        this.weights = weights;
+        int n = weights.length;
+        this.costs = new int[n][n];
+        this.p = new int[n][n];
+    }
+
+    public void basicAlgorithm() {
+        fillInRandomWeights();
+        floyd();
+    }
+
+    /**
+     * Floyd-Warshall all-pairs shortest paths
+     */
+    public void floyd() {
+        initializeFloyd();
+        int n = weights.length;
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
+                if (costs[i][k] == INFINITE) continue;
                 for (int j = 0; j < n; j++) {
-                    if (costs[i][k] != Integer.MAX_VALUE && costs[k][j] != Integer.MAX_VALUE &&
-                        costs[i][k] + costs[k][j] < costs[i][j]) {
-                        costs[i][j] = costs[i][k] + costs[k][j];
+                    if (costs[k][j] == INFINITE) continue;
+                    int throughK = costs[i][k] + costs[k][j];
+                    if (throughK < costs[i][j]) {
+                        costs[i][j] = throughK;
                         p[i][j] = p[k][j];
                     }
                 }
             }
         }
-	}
+    }
 
-	private static void fillInRandomWeights(int[][] weights) {
-		Random p = new Random();
-		for (int i = 0; i < weights.length; i++) {
-			for (int j = 0; j < weights.length; j++) {
-				if (p.nextDouble() < p1) {
-					weights[i][j] = p.nextInt(minWeight, maxWeight+1);
-				} else
-					weights[i][j] = Integer.MAX_VALUE;
-			}
-		}
-	}
+    /**
+     * Initialize costs = weights, set diagonal 0, set predecessors
+     */
+    private void initializeFloyd() {
+        int n = weights.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    costs[i][j] = 0;
+                    p[i][j] = EMPTY;
+                } else if (weights[i][j] != INFINITE) {
+                    costs[i][j] = weights[i][j];
+                    p[i][j] = i;
+                } else {
+                    costs[i][j] = INFINITE;
+                    p[i][j] = EMPTY;
+                }
+            }
+        }
+    }
+
+    /**
+     * Randomly fill adjacency matrix
+     */
+    private void fillInRandomWeights() {
+        Random rnd = new Random();
+        int n = weights.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    weights[i][j] = 0;
+                } else if (rnd.nextDouble() < p1) {
+                    weights[i][j] = rnd.nextInt(minWeight, maxWeight + 1);
+                } else {
+                    weights[i][j] = INFINITE;
+                }
+            }
+        }
+    }
+
+    /**
+     * Print minimal path and cost from origin to destination
+     */
+    public void printFloydPath(int origin, int destination) {
+        int n = weights.length;
+        if (origin < 0 || origin >= n) {
+            throw new IllegalArgumentException("printFloydPath: origin out of bounds");
+        }
+        if (destination < 0 || destination >= n) {
+            throw new IllegalArgumentException("printFloydPath: destination out of bounds");
+        }
+        System.out.print("FROM " + v[origin] + " TO " + v[destination] + " = ");
+        if (costs[origin][destination] == INFINITE) {
+            System.out.println("THERE IS NO PATH");
+        } else {
+            // reconstruct path
+            printPath(origin, destination);
+            System.out.println();
+            System.out.println("MINIMUM COST = " + costs[origin][destination]);
+        }
+        System.out.println("**************");
+    }
+
+    /**
+     * Recursive path printer: prints sequence of nodes
+     */
+    private void printPath(int i, int j) {
+        if (i == j) {
+            System.out.print(v[i]);
+        } else if (p[i][j] == EMPTY) {
+            // direct edge
+            System.out.print(v[i] + " --> " + v[j]);
+        } else {
+            int k = p[i][j];
+            printPath(i, k);
+            System.out.print(" --> " + v[j]);
+        }
+    }
+
+    /**
+     * Utility: print any integer matrix (INF for infinite)
+     */
+    public static void printMatrix(int[][] matrix) {
+        int n = matrix.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == INFINITE) System.out.print("    Inf");
+                else System.out.printf("%7d", matrix[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
 }
