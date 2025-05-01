@@ -1,60 +1,86 @@
 package BB;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.UUID;
 
-public class Node implements Comparable<Node> {
-    private List<Integer> path; // Nodes visited
-    private int cost;           // Heuristic cost
-    private int currentNode;
-    private int[][] weights;
-    private int end;
+/**
+ * To represents the different states of a problem in the graph
+ * For each problem, we should extend this class with specific information
+ * We also need to compare Nodes because it is the way to compare them in the priority queue
+ */
+public abstract class Node implements Comparable<Node> {
+    protected int depth; //Number of moves made so far (is equal to the number of nodes developed) on this branch
+    protected UUID parentID; //Parent ID for node tracking
+    protected UUID ID; //ID for the node
+    protected int heuristicValue; //Value of the calculated heuristic
 
-    public Node(int currentNode, List<Integer> path, int cost, int[][] weights, int end) {
-        this.currentNode = currentNode;
-        this.path = new ArrayList<>(path);
-        this.cost = cost;
-        this.weights = weights;
-        this.end = end;
-    }
-
-    public boolean isSolution() {
-        return currentNode == end && path.size() == weights.length;
-    }
-
-    public int getHeuristicValue() {
-        return cost;
-    }
-
-    public ArrayList<Node> expand() {
-        ArrayList<Node> children = new ArrayList<>();
-        for (int i = 0; i < weights.length; i++) {
-            if (!path.contains(i) && weights[currentNode][i] != 0) {
-                List<Integer> newPath = new ArrayList<>(path);
-                newPath.add(i);
-                int newCost = cost + weights[currentNode][i];
-                Node child = new Node(i, newPath, newCost, weights, end);
-                children.add(child);
-            }
-        }
-        return children;
-    }
-
-    @Override
-    public int compareTo(Node other) {
-        return Integer.compare(this.cost, other.cost);
-    }
-
-    @Override
-    public String toString() {
-        return "Node[path=" + path + ", cost=" + cost + "]";
+    /**
+     * Constructor for Node objects
+     */
+	public Node() { //Values by default
+    	depth = 0; 
+    	parentID = null; //It does not have parent unless we say another thing
+    	ID = UUID.randomUUID();
+	}
+	
+	/**
+	 * Getter for depth
+	 * @return The depth variable
+	 */
+    public int getDepth() {return depth;}
+	  
+    /**
+     * Getter for heuristicValue
+     * @return The heuristicValue variable
+     */
+	public int getHeuristicValue() { return heuristicValue; }
+	
+	/**
+	 * Compares whether two nodes are equal using the ToString method
+	 * @param n Another node to be compared with
+	 * @return True if there are equal. False otherwise
+	 */
+    public boolean equals(Node n) {
+		return (n.toString().equals(toString()));
+	}
+    
+    /**
+     * Getter for parentID
+     * @return The parentID variable
+     */
+    public UUID getParentID() {
+    	return parentID;
     }
     
-    public List<Integer> getPath() {
-        return new ArrayList<>(path);
+    /**
+     * Gets the ID of the node
+     * @return ID of the node
+     */
+    public UUID getID() {
+    	return ID;
     }
-
-    public int getCost() {
-        return cost;
-    }
-
+    
+    /**
+     * We can have extra information about the problem to prune all the nodes
+     * above a specific heuristicValue. By default we know nothing, so we 
+     * do not prune anything
+     * @return Value of the initial prune limit 
+     */
+	public int initialValuePruneLimit() {
+		return Integer.MAX_VALUE - 1; //Implementation by default
+	}
+    
+	@Override
+	public int compareTo(Node node) { //BRANCHING METHOD
+		int totalValue = heuristicValue;
+		int totalValueToBeCompared = node.getHeuristicValue();
+		
+		if (totalValue > totalValueToBeCompared) return 1; //this has less priority (is bigger)
+		else if (totalValue == totalValueToBeCompared) return 0; //The same priority
+		else return -1; //this has more priority (is smaller)
+	}
+    
+	public abstract void calculateHeuristicValue();
+	public abstract ArrayList<Node> expand();
+	public abstract boolean isSolution();
 }
